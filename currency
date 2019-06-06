@@ -1,0 +1,331 @@
+#include <iostream>
+#include <cstdlib>
+#include <math.h>
+#include <cmath>
+
+using namespace std;
+
+struct Currency {
+	int dollars, cents;
+};
+
+
+void testPrimitives(); 		//Will read in all values
+void testIO();				//basic bullshit to make sure everything works
+void testArithmetic();		//more basic bullshit
+
+Currency check(Currency&);
+
+ostream &operator <<(ostream &os, const Currency &c);
+istream &operator >>(istream &is, Currency &c);
+
+Currency check(Currency &c)
+{
+	c.dollars = c.dollars + c.dollars/100;
+	c.cents = c.cents % 100;
+	return c;
+
+}
+
+ostream &operator <<(ostream &os, const Currency &c)
+{
+	os <<"$"<<c.dollars << "." << c.cents;
+	return os;
+}
+
+istream &operator >>(istream &is, Currency &c)
+{
+	is >> c.dollars;
+	is >> c.cents;
+	return is;
+}
+
+int dollars(Currency c) {return c.dollars;}
+int cents(Currency c) {return c.cents;}
+
+double round(double);
+
+//HEADER FOR ALL IN PLACE FUNCTIONS
+Currency &operator +=(Currency &r1, const Currency &r2);			//ADDITION
+Currency &operator -=(Currency &c1, const Currency &c2);			//SUBTRACTION
+Currency &operator *=(Currency &c1, int number);					//MULTIPLY
+Currency &operator /=(Currency &c1, int number);					//DIVISION
+
+//HEADER FOR ALL RESULT RETURNING FUNCTIONS
+Currency operator +(const Currency &r1, const Currency &r2);		//ADDITION
+Currency operator -(const Currency &c1, const Currency &c2);		//SUBTRACTION
+Currency operator *(const Currency &c1, int number);				//MULTIPLY
+Currency operator /(const Currency &c1, int number);				//DIVISION
+
+
+//ROUNDING
+double round(double x)
+{
+	cout<<"$"<<x<<" - round: $"<<(round (x));
+	cout<<" floor: $"<< (floor (x));
+	cout<<" ceiling: $"<< (ceil (x))<<endl;
+}
+//Parameter c1 will change in these functions thus it isnt a const
+
+Currency &operator +=(Currency &c1, const Currency &c2)									//Addition IN PLACE
+{
+	c1.dollars = (c1.dollars + c2.dollars);
+	c1.cents = (c1.cents + c2.cents);
+	check(c1);
+	return c1;
+}
+
+Currency &operator -=(Currency &c1, const Currency &c2)							//Subtraction IN PLACE
+{
+	c1.dollars = c1.dollars - c1.dollars;
+	c1.cents   = c2.cents - c2.cents;
+	check(c1);
+	return c1;
+}
+
+Currency &operator *=(Currency &c1, int number)						//Multiplication IN PLACE
+{
+	c1.dollars = c1.dollars * number;
+	c1. cents  = c1.cents   * number;
+	check(c1);
+	return c1;
+}
+Currency &operator *(Currency &c1, int number)						//Multiplication IN PLACE
+{
+    Currency result; //return value
+	result.dollars = c1.dollars * number;
+	result.cents  = c1.cents   * number;
+    check(c1);
+	return c1;
+}
+
+
+//Now we begin the result returns so parameters will be const since they wont change
+
+Currency operator +(const Currency &c1, const Currency &c2)
+{
+	Currency result; //return value
+
+	result.dollars = (c1.dollars + c2.dollars);
+	result.cents = (c1.cents + c2.cents);
+	check(result);
+	return result;
+}
+
+Currency operator -(const Currency &c1, const Currency &c2)
+{
+	Currency result; //return value
+
+	result.dollars = (c1.dollars - c2.dollars);
+	result.cents = (c1.cents - c2.cents);
+	check(result);
+	return result;
+}
+
+void testPrimitives()
+{
+	cout << "*** Testing primitives ..." << endl;
+	Currency c;
+	cout << "Enter dollars: ";
+	cin >> c.dollars;
+	while (cin && c.dollars != -9999) {
+		cout << "Enter Cents: ";
+		cin >> c.cents;
+
+	check(c);
+
+		cout << "Dollars: " << dollars(c) << " cents: " << cents(c) << endl;
+		cout << "Enter Dollars: ";
+		cin >> c.dollars;
+	}
+
+	cout << "*** Primitives testing completed" << endl << endl;
+}
+
+void testIO()
+{
+	cout << "*** Testing I/O ..." << endl;
+	Currency c1 = {5, 10};
+	cout << dollars(c1) << " " << cents(c1) << " prints as " << c1 << endl;
+	Currency c2 = {7, 1};
+	cout << dollars(c2) << " " << cents(c2) << " prints as " << c2 << endl;
+
+	cin >> c1 >> c2;
+	cout << "Read in c1: " << c1 << " " << " c2: " << c2 << endl;
+	cout << "*** I/O testing completed" << endl << endl;
+}
+
+void testArithmetic()
+{
+	cout << "*** Testing arithmetic ..." << endl;
+
+    Currency c1;
+    Currency c2;
+
+	cout<<"Enter first currency value: ";
+	cin>> c1.dollars >> c1.cents;
+	cout<< c1.dollars<< " " << c1.cents<<endl;
+	//should print out --------->      			Enter first currency value: 1 0
+
+
+	cout<<"Enter second currency value: ";
+	cin>> c2.dollars >> c2.cents;
+	cout<< c2.dollars<< " " << c2.cents<<endl;
+	// should print out --------->      		Enter first currency value: 2 0
+
+
+	cout<<"Enter integer for multiply: ";
+	int integer;
+	cin>>integer;
+	cout<< integer<<endl;
+	// should print out -------------> 			Enter integer for multiply: 5
+
+
+	cout<<"Read in c1: $"<<c1.dollars<<"."<<c1.cents<<" ";
+	cout<<"Read in c2: $"<<c2.dollars<<"."<<c2.cents<<" ";
+	cout<<"n: "<<integer<<endl;
+	// should print out ------------>			Read in c1: $1.0 c2: $2.0 n: 5
+
+
+	cout<<"c1 + c2: $"<<c1.dollars + c2.dollars<<"."<< c1.cents + c2.cents<<endl;
+	// should print out ------------------->	c1 + c2: $3.0
+
+
+	cout<<"c2 * n : $"<<c2.dollars * integer<<"."<<c2.cents*integer<<endl;
+	// should print out --------------> 		c2 * n : $10.0
+
+
+	c1.dollars += c2.dollars;
+	c1.cents +=c2.cents;
+	cout<<"After c1 += c2, c1: $"<<c1.dollars<<"."<<c1.cents<<endl;
+	// should print out ------------>			After c1 += c2, c1: $3.0
+
+
+
+
+	cout<<"After c2 *= n, c2: $"<<(c2.dollars *= integer);
+	// should print out ------------>			After c2 *= n, c2: $10.0
+
+
+	cout<<" Enter first currency value: ";
+	cin>>c1.dollars;
+	cin>> c1.cents;
+	cout<<c1.dollars<<" "<<c1.cents<<endl;
+	// should print out ------------>			Enter first currency value: 0 50
+
+
+	cout<<" Enter second currency value: ";
+	cin>> c2.dollars;
+	cin>> c2.cents;
+	cout<< c2.dollars<<" "<<c2.cents<<endl;
+	// should print out ------------>			Enter second currency value: 0 51
+
+
+	int num;
+	cout<<"Enter integer for multiply: ";
+	cin>>num;
+	cout<<num<<endl;
+	// should print out ------------>			Enter integer for multiply: 3
+
+
+	cout<<"Read in c1: $ "<<c1.dollars<<"."<<c1.cents<<" c2: $";
+	cout<<c2.dollars<<"."<<c2.cents<<" n: "<<num<<endl;
+	// should print out ------------>			Read in c1: $0.50 c2: $0.51 n: 3
+
+	cout<<"c1 + c2: $";
+	int result;
+	cout<< c1 + c2;
+	// should print out ------------>			c1 + c2: $1.1
+
+	cout<<"c1 * n: $";
+	int numformultiply;
+	cin>>numformultiply;
+	cout<<c1 * numformultiply;
+	// should print out ------------>			c2 * n : $1.53
+
+	cout<<"After c1 += c2, c1: $";
+	cout<< (c1 += c2);
+	// should print out ------------>			After c1 += c2, c1: $1.1
+
+	cout<<"After c2 *= n, c2: $";
+	int numformultiply2;
+	cin>>numformultiply2;
+	cout<<(c1 *= numformultiply2);
+	// should print out ------------>			After c2 *= n, c2: $1.53
+
+	cout<<"Enter first currency value: ";
+	cin>>c1.dollars;
+	cin>>c1.cents;
+	cout<<c1.dollars<<" "<<c1.cents;
+	cout<<endl;
+	// should print out ------------>			Enter first currency value: 2 99
+
+	cout<<"Enter second currency value: ";
+	cin>>c2.dollars;
+	cin>>c2.cents;
+	cout<<c2.dollars<<" "<<c2.cents;
+	cout<<endl;
+	// should print out ------------>			Enter second currency value: 0 1
+
+	int x;
+	cout<<"Enter integer for multiply: ";
+	cin>>x;
+	// should print out ------------>			Enter integer for multiply: 200
+
+
+	cout<<"Read in c1: $"<<c1.dollars<<"."<<c1.cents;
+	cout<<" c2: $"<<c2.dollars<<"."<<c2.cents<<" n: "<<x;
+	// should print out ------------>			Read in c1: $2.99 c2: $0.1 n: 200
+
+	cout<<"c1 + c2: $"<<c1 + c1<<endl;
+	// should print out ------------>		c1 + c2: $3.0
+
+	cout<<"c2 * n : $"<<c1*x<<endl;
+	// should print out ------------>		c2 * n : $2.0
+
+	cout<<"After c1 += c2, c1: $"<<(c1 += c2);
+	// should print out ------------>		After c1 += c2, c1: $3.0
+
+	cout<<"After c2 *= n, c2: $"<<(c2 *= x);
+	// should print out ------------>		After c2 *= n, c2: $2.0
+
+
+
+	cout<<"*** Arithmetic testing completed"<<endl<<endl;
+}
+
+void testRounding()
+{
+    cout<<"*** Testing rounding ..."<<endl;
+
+	for(int x; x>2.00;x=x+0.01)
+        round(x);
+
+    cout<<"*** Rounding testing completed"<<endl;
+}
+
+void testBasics() {
+	cout << "*** Testing basics ..." << endl;
+	for (int d = -5; d <= 5; d++)
+		for (int c = -5; c <= 5; c++) {
+			Currency c1 = {d, c};
+
+				check(c1);
+
+			cout << dollars(c1) << " " << cents(c1) << " -> " << c1 << " -> ";
+			//check
+			cout << c1 << endl;
+		}
+
+	cout << "*** Basics testing completed" << endl << endl;
+}
+
+
+
+int main()
+{
+    testPrimitives();
+	testIO();
+	testArithmetic();
+    return 0;
+}
